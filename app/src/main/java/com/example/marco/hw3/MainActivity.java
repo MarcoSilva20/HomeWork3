@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
@@ -41,20 +42,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return anw;
     }
 
+    long timestamp = 0;
+
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(event.sensor.getType()==Sensor.TYPE_LIGHT){
-            showAnswer(getAnswer(),false);
-        }
+            int val = (int)event.values[0];
+            long h =  (new Date()).getTime() + (event.timestamp - System.nanoTime()) / 1000000L;
+            if(val<70) timestamp = h;
+            else{
+                long dif = (event.timestamp - timestamp) % 20;
+                if(event.sensor.getType()==Sensor.TYPE_LIGHT){
+                    showAnswer(getAnswer((int)dif),false);
+                }
+                }
     }
+
+
 
     private void showAnswer(String answer, boolean b) {
         label.setText(answer);
     }
 
-    private String getAnswer() {
+    private String getAnswer(int val) {
         int randomint = random.nextInt(answers.size());
-        return answers.get(randomint);
+        return answers.get(val);
 
     }
 
